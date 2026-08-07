@@ -107,7 +107,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 1s ease, visibility 1s ease;
+            transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
         }
         #loader-container canvas {
             position: absolute;
@@ -119,7 +119,7 @@
         }
         #loader-container #welcome-text {
             position: absolute;
-            top: 50%;
+            top: 25%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.2);
             font-size: clamp(32px, 11vw, 120px);
@@ -727,7 +727,7 @@
                   setTimeout(() => {
                       cancelAnimationFrame(loaderAnimationFrame);
                       loaderContainer.remove();
-                  }, 1000);
+                  }, 1500);
               }
 
               if (!loaderFading || elapsed < 7000) {
@@ -742,7 +742,7 @@
         
         function getSubtractAmount(year, month) {
             // August is month index 7
-            if (year > 2024 || (year === 2024 && month >= 7)) {
+            if (year > 2026 || (year === 2026 && month >= 7)) {
                 return 30;
             }
             return 25;
@@ -934,20 +934,22 @@
         function downloadCurrentMonthExcel() {
             let currentSubtractAmount = getSubtractAmount(displayYear, displayMonth);
             
-            let csvContent = "";
-            csvContent += `Month Report, ${monthNames[displayMonth]} ${displayYear}\n`;
-            csvContent += `Base Monthly Total, ₹${baseTotal}\n`;
-            csvContent += `Final Bill Total, ₹${displayTotal}\n\n`;
-            csvContent += "Date,Status,Amount\n";
+            let htmlTable = `<table border="1">`;
+            htmlTable += `<tr><th colspan="3" style="font-size:18px;">Month Report, ${monthNames[displayMonth]} ${displayYear}</th></tr>`;
+            htmlTable += `<tr><th colspan="3">Base Monthly Total: ₹${baseTotal}</th></tr>`;
+            htmlTable += `<tr><th colspan="3">Final Bill Total: ₹${displayTotal}</th></tr>`;
+            htmlTable += `<tr><th>Date</th><th>Status</th><th>Amount</th></tr>`;
 
             for (let i = 1; i <= daysInMonth; i++) {
                 let dateId = `${displayYear}-${displayMonth}-${i}`;
                 let isCrossed = crossedDates.includes(dateId);
                 let status = isCrossed ? "Cut" : "Delivered";
                 let amount = isCrossed ? `-₹${currentSubtractAmount}` : `₹0`;
-                csvContent += `${i}-${monthNames[displayMonth]}-${displayYear},${status},${amount}\n`;
+                htmlTable += `<tr><td>${i}-${monthNames[displayMonth]}-${displayYear}</td><td>${status}</td><td>${amount}</td></tr>`;
             }
-            triggerDownload(csvContent, `Milk_Report_${monthNames[displayMonth]}_${displayYear}.csv`);
+            htmlTable += `</table>`;
+            
+            triggerDownloadXLS(htmlTable, `Milk_Report_${monthNames[displayMonth]}_${displayYear}.xls`);
         }
 
         // 2. Custom Export Modal Logic
@@ -978,9 +980,9 @@
             
             if(startDate > endDate) return alert("Start Date must be before End Date.");
 
-            let csvContent = "";
-            csvContent += `Custom Milk Chart, From ${startVal} to ${endVal}\n\n`;
-            csvContent += "Date,Status,Amount Saved\n";
+            let htmlTable = `<table border="1">`;
+            htmlTable += `<tr><th colspan="3" style="font-size:18px;">Custom Milk Chart: From ${startVal} to ${endVal}</th></tr>`;
+            htmlTable += `<tr><th>Date</th><th>Status</th><th>Amount Saved</th></tr>`;
             
             let currentWalker = new Date(startDate);
             let totalSaved = 0;
@@ -1002,60 +1004,47 @@
                 if(isCrossed) totalSaved += amt;
                 else totalDelivered++;
 
-                csvContent += `${wDate}-${monthNames[wMonth]}-${wYear},${status},${amount}\n`;
+                htmlTable += `<tr><td>${wDate}-${monthNames[wMonth]}-${wYear}</td><td>${status}</td><td>${amount}</td></tr>`;
                 
                 // Move to next day
                 currentWalker.setDate(currentWalker.getDate() + 1);
             }
             
-            csvContent += `\nTotal Delivered Days, ${totalDelivered}\n`;
-            csvContent += `Total Money Saved from Cuts, ₹${totalSaved}\n`;
+            htmlTable += `<tr><th colspan="2">Total Delivered Days</th><th>${totalDelivered}</th></tr>`;
+            htmlTable += `<tr><th colspan="2">Total Money Saved from Cuts</th><th>₹${totalSaved}</th></tr>`;
+            htmlTable += `</table>`;
 
-            triggerDownload(csvContent, `Custom_Milk_Chart_${startVal}_to_${endVal}.csv`);
+            triggerDownloadXLS(htmlTable, `Custom_Milk_Chart_${startVal}_to_${endVal}.xls`);
             closeModal();
         }
 
-        function triggerDownload(csvContent, fileName) {
+        function triggerDownloadXLS(htmlTable, fileName) {
             try {
-                // Add BOM for proper Excel rendering of currency symbols
-                const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-                const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+                // Excel HTML template
+                const template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sheet1</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>{table}</body></html>';
                 
-                // Try Web Share API for better mobile support if available
-                if (navigator.canShare && navigator.userAgent.toLowerCase().includes('mobile')) {
-                    const file = new File([blob], fileName, { type: 'text/csv' });
-                    if (navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            title: fileName,
-                            files: [file]
-                        }).catch(err => {
-                            console.log("Share failed, falling back to download link", err);
-                            fallbackDownload(blob, fileName);
-                        });
-                        return; // Successfully triggered share
-                    }
-                }
+                const finalHtml = template.replace('{table}', htmlTable);
+                const base64 = btoa(unescape(encodeURIComponent(finalHtml)));
+                const dataUri = 'data:application/vnd.ms-excel;base64,' + base64;
                 
-                // Standard fallback download
-                fallbackDownload(blob, fileName);
+                // Using standard download link approach
+                const link = document.createElement("a");
+                link.href = dataUri;
+                link.download = fileName;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                
+                // This triggers the download in most browsers and some WebViews with DownloadListener
+                link.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                }, 200);
+
             } catch (e) {
                 console.error("Download Error: ", e);
                 alert("Download failed on your browser/app. Try using a standard browser.");
             }
-        }
-
-        function fallbackDownload(blob, fileName) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            setTimeout(() => {
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }, 200);
         }
 
         // --- NETWORK SYNC ---
