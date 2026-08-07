@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Milk Tracker Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- 10 PREMIUM THEMES --- */
+        :root { /* 1. Default Dark */ --bg-grad-1: #0f172a; --bg-grad-2: #1e1b4b; --card-bg: rgba(30, 41, 59, 0.7); --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #3b82f6; --accent: #ef4444; --border: rgba(255, 255, 255, 0.1); }
+        [data-theme="light"] { /* 2. Minimal Light */ --bg-grad-1: #f3f4f6; --bg-grad-2: #e5e7eb; --card-bg: rgba(255, 255, 255, 0.9); --text-main: #111827; --text-muted: #6b7280; --primary: #2563eb; --accent: #dc2626; --border: rgba(0, 0, 0, 0.1); }
+        [data-theme="cyberpunk"] { /* 3. Cyberpunk */ --bg-grad-1: #fce803; --bg-grad-2: #ff007c; --card-bg: rgba(0, 0, 0, 0.85); --text-main: #0ff; --text-muted: #f0f; --primary: #0ff; --accent: #f0f; --border: rgba(0, 255, 255, 0.4); }
+        [data-theme="forest"] { /* 4. Forest */ --bg-grad-1: #0f3e1b; --bg-grad-2: #051f0b; --card-bg: rgba(20, 60, 30, 0.8); --text-main: #e2f0e5; --text-muted: #8eb897; --primary: #4ade80; --accent: #ef4444; --border: rgba(74, 222, 128, 0.2); }
+        [data-theme="ocean"] { /* 5. Ocean */ --bg-grad-1: #001b3a; --bg-grad-2: #004d7a; --card-bg: rgba(0, 40, 70, 0.7); --text-main: #e0f2fe; --text-muted: #7dd3fc; --primary: #38bdf8; --accent: #fb7185; --border: rgba(56, 189, 248, 0.2); }
+        [data-theme="sunset"] { /* 6. Sunset */ --bg-grad-1: #4a00e0; --bg-grad-2: #8e2de2; --card-bg: rgba(255, 255, 255, 0.15); --text-main: #fff; --text-muted: #ffd1d1; --primary: #fcd34d; --accent: #ff4b2b; --border: rgba(255, 255, 255, 0.3); }
+        [data-theme="dracula"] { /* 7. Dracula */ --bg-grad-1: #282a36; --bg-grad-2: #191a21; --card-bg: rgba(68, 71, 90, 0.85); --text-main: #f8f8f2; --text-muted: #6272a4; --primary: #8be9fd; --accent: #ff5555; --border: rgba(98, 114, 164, 0.4); }
+        [data-theme="coffee"] { /* 8. Coffee */ --bg-grad-1: #3e2723; --bg-grad-2: #1b0000; --card-bg: rgba(78, 52, 46, 0.85); --text-main: #efebe9; --text-muted: #bcaaa4; --primary: #ffb300; --accent: #d84315; --border: rgba(215, 204, 200, 0.2); }
+        [data-theme="blossom"] { /* 9. Blossom */ --bg-grad-1: #ffe4e6; --bg-grad-2: #fbcfe8; --card-bg: rgba(255, 255, 255, 0.75); --text-main: #831843; --text-muted: #be185d; --primary: #db2777; --accent: #e11d48; --border: rgba(219, 39, 119, 0.3); }
+        [data-theme="matrix"] { /* 10. Matrix */ --bg-grad-1: #000000; --bg-grad-2: #050505; --card-bg: rgba(0, 20, 0, 0.9); --text-main: #00ff00; --text-muted: #008800; --primary: #00ff00; --accent: #00ff00; --border: rgba(0, 255, 0, 0.3); }
+
+        /* --- GLOBAL & STRUCTURAL --- */
+        ::-webkit-scrollbar { display: none; }
+        html, body { -ms-overflow-style: none; scrollbar-width: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; user-select: none; transition: background 0.4s ease, color 0.4s ease, border 0.4s ease; }
+        
+        body { background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2)); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; overflow-x: hidden; }
+        
+        .app-container { background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 28px; padding: 30px 25px; width: 100%; max-width: 440px; box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6); position: relative; z-index: 1; }
+
+        /* --- LOGO & DATE --- */
+        .brand-logo { text-align: center; font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .logo-text { background: linear-gradient(90deg, var(--text-main), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: mobilePulse 2.5s infinite alternate ease-in-out; }
+        @keyframes mobilePulse { 0% { filter: drop-shadow(0 0 2px var(--primary)); transform: scale(0.99); } 100% { filter: drop-shadow(0 0 8px var(--text-main)); transform: scale(1.01); } }
+        
+        .current-date-banner { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 25px; letter-spacing: 1px; text-transform: uppercase; }
+        .current-date-banner span { color: var(--primary); font-weight: 800; }
+
+        /* --- CONTROLS --- */
+        .top-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        select.theme-selector { background: rgba(0,0,0,0.1); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 10px; outline: none; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+        select.theme-selector option { background: #1e293b; color: #fff; }
+        .btn { background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s, background 0.2s; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .btn:active { transform: scale(0.95); }
+        .btn-alt { background: transparent; border: 1px solid var(--primary); color: var(--primary); box-shadow: none; }
+        .btn-alt:hover { background: rgba(255,255,255,0.05); }
+
+        /* --- TOTAL AMOUNT --- */
+        .total-container { text-align: center; margin-bottom: 25px; padding: 15px 0; border-radius: 16px; background: rgba(0,0,0,0.15); border: 1px solid var(--border); }
+        .total-container p { color: var(--text-muted); font-weight: 600; font-size: 0.85rem; margin-bottom: 5px; }
+        .total-amount { font-size: 3.5rem; font-weight: 800; color: var(--primary); line-height: 1; text-shadow: 0 0 20px var(--primary); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .total-amount.bounce { transform: scale(1.15); color: var(--text-main); }
+
+        /* --- CALENDAR --- */
+        .month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.2rem; font-weight: 700; background: rgba(0,0,0,0.2); border-radius: 14px; padding: 8px 15px; border: 1px solid var(--border); }
+        .nav-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 5px; transition: color 0.2s, transform 0.2s; display: flex; justify-content: center; align-items: center; }
+        .nav-btn svg { width: 26px; height: 26px; stroke: currentColor; }
+        .nav-btn:hover { color: var(--primary); transform: scale(1.1); }
+        .nav-btn:active { transform: scale(0.9); }
+        
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; font-size: 0.85rem; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; perspective: 1000px; }
+
+        .day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid transparent; border-radius: 12px; cursor: pointer; font-weight: 600; position: relative; font-size: 0.95rem; opacity: 0; transform: scale(0.8) translateY(10px); }
+        .day:hover:not(.empty) { background: rgba(255, 255, 255, 0.1); transform: scale(1.05) translateY(0); z-index: 10; border-color: var(--primary); }
+        .day:active { transform: scale(0.9); }
+        .day.empty { background: transparent; cursor: default; }
+
+        @keyframes popIn { to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .day.is-today { border: 2px solid var(--primary); color: var(--primary); box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 10px var(--primary); font-weight: 800; }
+
+        .day.crossed { color: var(--text-muted); background: rgba(0, 0, 0, 0.4); border-color: transparent; }
+        .day.crossed::before, .day.crossed::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 3px; background: var(--accent); border-radius: 3px; box-shadow: 0 0 10px var(--accent); z-index: 2; }
+        .day.crossed::before { transform: translate(-50%, -50%) rotate(45deg); animation: drawCross 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .day.crossed::after { transform: translate(-50%, -50%) rotate(-45deg); animation: drawCross 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.15s; }
+        @keyframes drawCross { to { width: 85%; } }
+
+        .floating-number { position: absolute; font-size: 1.4rem; font-weight: 800; pointer-events: none; z-index: 100; animation: floatUp 1.2s ease-out forwards; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .floating-number.negative { color: var(--accent); }
+        .floating-number.positive { color: var(--primary); }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(0.8); } 20% { transform: translateY(-10px) scale(1.2); } 100% { opacity: 0; transform: translateY(-50px) scale(1); } }
+        
+        .sync-status { text-align: center; font-size: 0.8rem; margin-top: 15px; font-weight: 600; color: var(--text-muted); opacity: 0; transition: opacity 0.3s; }
+        .sync-status.active { opacity: 1; }
+
+        /* --- CUSTOM EXPORT MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--primary); padding: 25px; border-radius: 24px; width: 90%; max-width: 350px; transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-content h3 { color: var(--text-main); margin-bottom: 15px; text-align: center; }
+        .modal-content label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; margin-top: 10px;}
+        .modal-content input[type="date"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text-main); outline: none; margin-bottom: 15px; font-family: 'Poppins'; color-scheme: dark;}
+        [data-theme="light"] .modal-content input[type="date"] { color-scheme: light; }
+        .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+
+        /* --- LOADER CONTAINER --- */
+        #loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #06070a;
+            z-index: 9999;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+        #loader-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        #loader-container #welcome-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.2);
+            font-size: clamp(32px, 11vw, 120px);
+            color: #ffffff;
+            font-weight: 900;
+            letter-spacing: clamp(6px, 2.5vw, 25px);
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            white-space: nowrap;
+            text-transform: uppercase;
+            filter: blur(30px);
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.95), 0 0 60px rgba(180, 220, 255, 0.85), 0 0 120px rgba(255, 255, 255, 0.6);
+        }
+        #loader-container #loader-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #06070a;
+            z-index: 20;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="loader-container">
+        <canvas id="canvas"></canvas>
+        <div id="loader-overlay"></div>
+        <div id="welcome-text">WELCOME</div>
+    </div>
+
+    <div class="app-container" style="display: none;" id="main-app">
+        <div class="brand-logo"><span class="logo-text">🥛 Milk Tracker</span></div>
+        <div class="current-date-banner" id="currentDateBanner">Today is: <span>Loading...</span></div>
+
+        <div class="top-controls">
+            <select class="theme-selector" id="themeSelector" onchange="changeTheme()">
+                <option value="default">1. Midnight Dark</option>
+                <option value="light">2. Minimal Light</option>
+                <option value="cyberpunk">3. Cyberpunk Neon</option>
+                <option value="forest">4. Mint Forest</option>
+                <option value="ocean">5. Deep Ocean</option>
+                <option value="sunset">6. Sunset Glow</option>
+                <option value="dracula">7. Dracula</option>
+                <option value="coffee">8. Caramel Coffee</option>
+                <option value="blossom">9. Cherry Blossom</option>
+                <option value="matrix">10. Hacker Matrix</option>
+            </select>
+            <button class="btn btn-alt" onclick="openModal()">📅 Custom Chart</button>
+        </div>
+
+        <div class="total-container">
+            <p>Total Milk Bill (<span id="baseAmountText">₹0</span> Base)</p>
+            <div class="total-amount" id="totalAmountDisplay">₹0</div>
+        </div>
+        
+        <div class="month-header">
+            <button class="nav-btn" onclick="changeMonth(-1)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <span id="monthYearDisplay" style="text-align:center; flex-grow: 1;">Loading...</span>
+            <button class="nav-btn" onclick="changeMonth(1)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        </div>
+        <div class="weekdays"><div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div></div>
+        
+        <div class="days-grid" id="daysGrid"></div>
+        
+        <button class="btn" onclick="downloadCurrentMonthExcel()" style="width: 100%; margin-top: 15px;">📥 Download <span id="btnMonthName">Month</span> CSV</button>
+        
+        <div class="sync-status" id="syncStatus">Ready</div>
+    </div>
+
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal-content">
+            <h3>Custom Export Chart</h3>
+            <label>Start Date</label>
+            <input type="date" id="exportStart">
+            <label>End Date</label>
+            <input type="date" id="exportEnd">
+            <div class="modal-btns">
+                <button class="btn btn-alt" onclick="closeModal()">Cancel</button>
+                <button class="btn" onclick="generateCustomExport()">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LOADER LOGIC ---
+        (function() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            let W, H, dpr;
+
+            function resize() {
+              W = window.innerWidth;
+              H = window.innerHeight;
+              dpr = Math.min(window.devicePixelRatio || 1, 2);
+              canvas.width = W * dpr;
+              canvas.height = H * dpr;
+              ctx.scale(dpr, dpr);
+            }
+            resize();
+            window.addEventListener('resize', () => {
+              resize();
+              initPhysics();
+            });
+
+            let mouse = { x: W / 2, y: H / 2, targetX: W / 2, targetY: H / 2 };
+
+            function handleInteraction(clientX, clientY) {
+              mouse.targetX = clientX;
+              mouse.targetY = clientY;
+              
+              const midY = liquidNodes.length > 0 ? liquidNodes[Math.floor(NODE_COUNT / 2)].targetY : H * 0.5;
+              if (Math.abs(clientY - midY) < H * 0.25) {
+                const startX = cup.x - cup.width * 0.46;
+                const endX = cup.x + cup.width * 0.46;
+                if (clientX >= startX && clientX <= endX) {
+                  const closestIndex = Math.floor(((clientX - startX) / (cup.width * 0.92)) * NODE_COUNT);
+                  if (closestIndex >= 0 && closestIndex < NODE_COUNT) {
+                    triggerImpulse(closestIndex, 32);
+                    spawnCrownSplash(clientX, midY);
+                    spawnFineMist(clientX, midY);
+                    spawnRipple(clientX, midY, 1.2);
+                  }
+                }
+              }
+            }
+
+            window.addEventListener('mousemove', (e) => {
+              mouse.targetX = e.clientX;
+              mouse.targetY = e.clientY;
+            });
+
+            canvas.addEventListener('click', (e) => {
+              handleInteraction(e.clientX, e.clientY);
+            });
+
+            canvas.addEventListener('touchstart', (e) => {
+              if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                handleInteraction(touch.clientX, touch.clientY);
+              }
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', (e) => {
+              if (e.touches.length > 0) {
+                mouse.targetX = e.touches[0].clientX;
+                mouse.targetY = e.touches[0].clientY;
+              }
+            }, { passive: true });
+
+            const NODE_COUNT = Math.min(160, Math.floor(W < 600 ? 100 : 160));
+            let liquidNodes = [];
+
+            let drop = { x: 0, y: 0, vy: 0, radius: 12, opacity: 0 };
+            let reboundDrop = { x: 0, y: 0, vy: 0, radius: 5, opacity: 0, active: false };
+            let crownParticles = [];
+            let splashParticles = [];
+            let ripples = [];
+            let cup = { x: 0, y: 0, width: 0, height: 0 };
+
+            function initPhysics() {
+              cup.x = W / 2;
+              cup.y = H * 0.58;
+              cup.width = Math.min(W * 0.72, 360);
+              cup.height = Math.min(H * 0.32, 270);
+              
+              drop.x = W / 2;
+              drop.y = -60;
+              drop.vy = 0;
+              drop.radius = Math.min(W * 0.03, 12);
+
+              liquidNodes = [];
+              const startX = cup.x - cup.width * 0.46;
+              const endX = cup.x + cup.width * 0.46;
+              const step = (endX - startX) / (NODE_COUNT - 1);
+              const baseY = cup.y - cup.height * 0.28;
+
+              for (let i = 0; i < NODE_COUNT; i++) {
+                liquidNodes.push({
+                  x: startX + i * step,
+                  y: baseY,
+                  targetY: baseY,
+                  vy: 0
+                });
+              }
+            }
+
+            initPhysics();
+
+            function updateLiquidSurface() {
+              const k = 0.032;       
+              const damping = 0.022; 
+              const spread = 0.3;    
+
+              for (let i = 0; i < NODE_COUNT; i++) {
+                let node = liquidNodes[i];
+                let dy = node.y - node.targetY;
+                let acceleration = -k * dy - damping * node.vy;
+                node.vy += acceleration;
+                node.y += node.vy;
+              }
+
+              let leftDeltas = new Float32Array(NODE_COUNT);
+              let rightDeltas = new Float32Array(NODE_COUNT);
+
+              for (let j = 0; j < 6; j++) {
+                for (let i = 0; i < NODE_COUNT; i++) {
+                  if (i > 0) {
+                    leftDeltas[i] = spread * (liquidNodes[i].y - liquidNodes[i - 1].y);
+                    liquidNodes[i - 1].vy += leftDeltas[i];
+                  }
+                  if (i < NODE_COUNT - 1) {
+                    rightDeltas[i] = spread * (liquidNodes[i].y - liquidNodes[i + 1].y);
+                    liquidNodes[i + 1].vy += rightDeltas[i];
+                  }
+                }
+                for (let i = 0; i < NODE_COUNT; i++) {
+                  if (i > 0) liquidNodes[i - 1].y += leftDeltas[i];
+                  if (i < NODE_COUNT - 1) liquidNodes[i + 1].y += rightDeltas[i];
+                }
+              }
+            }
+
+            function triggerImpulse(index, force) {
+              if (index >= 0 && index < NODE_COUNT) {
+                liquidNodes[index].vy = force;
+              }
+            }
+
+            function spawnCrownSplash(x, y) {
+              const count = W < 600 ? 24 : 36;
+              for (let i = 0; i < count; i++) {
+                const angle = -Math.PI + (i / count) * Math.PI * 2;
+                const speed = 3.5 + Math.random() * 5.5;
+                crownParticles.push({
+                  x: x,
+                  y: y,
+                  vx: Math.cos(angle) * speed,
+                  vy: -Math.abs(Math.sin(angle) * speed * 1.35) - (3 + Math.random() * 4),
+                  radius: 1.8 + Math.random() * 2.5,
+                  opacity: 0.95,
+                  gravity: 0.28,
+                  life: 1.0,
+                  decay: 0.016 + Math.random() * 0.012
+                });
+              }
+            }
+
+            function spawnFineMist(x, y) {
+              const count = W < 600 ? 25 : 45;
+              for (let i = 0; i < count; i++) {
+                const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.8;
+                const speed = 2.5 + Math.random() * 8.5;
+                splashParticles.push({
+                  x: x + (Math.random() - 0.5) * 10,
+                  y: y,
+                  vx: Math.cos(angle) * speed,
+                  vy: Math.sin(angle) * speed,
+                  radius: 1.2 + Math.random() * 3.2,
+                  opacity: 0.95,
+                  gravity: 0.3,
+                  life: 1.0,
+                  decay: 0.015 + Math.random() * 0.02
+                });
+              }
+            }
+
+            function spawnRipple(x, y, speedMult = 1.0) {
+              ripples.push({
+                x, y,
+                radius: 0,
+                maxRadius: cup.width * 0.44,
+                speed: 2.2 * speedMult,
+                opacity: 0.75,
+                life: 1.0
+              });
+            }
+
+            function drawGlassCup(opacity, offsetX, offsetY) {
+              if (opacity <= 0) return;
+              ctx.save();
+              ctx.globalAlpha = opacity;
+
+              const cx = cup.x + offsetX;
+              const cy = cup.y + offsetY;
+              const cw = cup.width;
+              const ch = cup.height;
+
+              const shadowGrad = ctx.createRadialGradient(cx, cy + ch * 0.42, 0, cx, cy + ch * 0.42, cw * 0.65);
+              shadowGrad.addColorStop(0, 'rgba(0,0,0,0.8)');
+              shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = shadowGrad;
+              ctx.beginPath();
+              ctx.ellipse(cx, cy + ch * 0.42, cw * 0.65, ch * 0.14, 0, 0, Math.PI * 2);
+              ctx.fill();
+
+              const topW = cw * 0.46;
+              const botW = cw * 0.32;
+
+              const glassGrad = ctx.createLinearGradient(cx - topW, cy, cx + topW, cy);
+              glassGrad.addColorStop(0, 'rgba(255,255,255,0.12)');
+              glassGrad.addColorStop(0.18, 'rgba(255,255,255,0.02)');
+              glassGrad.addColorStop(0.5, 'rgba(255,255,255,0.07)');
+              glassGrad.addColorStop(0.82, 'rgba(255,255,255,0.02)');
+              glassGrad.addColorStop(1, 'rgba(255,255,255,0.12)');
+
+              ctx.fillStyle = glassGrad;
+              ctx.beginPath();
+              ctx.moveTo(cx - topW, cy - ch * 0.3);
+              ctx.lineTo(cx - botW, cy + ch * 0.35);
+              ctx.quadraticCurveTo(cx, cy + ch * 0.42, cx + botW, cy + ch * 0.35);
+              ctx.lineTo(cx + topW, cy - ch * 0.3);
+              ctx.quadraticCurveTo(cx, cy - ch * 0.24, cx - topW, cy - ch * 0.3);
+              ctx.closePath();
+              ctx.fill();
+
+              ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+              ctx.lineWidth = 1.4;
+              ctx.stroke();
+
+              ctx.restore();
+            }
+
+            function drawMilkSurface(opacity, offsetX, offsetY) {
+              if (opacity <= 0) return;
+              ctx.save();
+              ctx.globalAlpha = opacity;
+
+              const cx = cup.x + offsetX;
+              const cy = cup.y + offsetY;
+              const cw = cup.width;
+              const ch = cup.height;
+              const botW = cw * 0.32;
+
+              const milkGrad = ctx.createLinearGradient(cx, cy - ch * 0.3, cx, cy + ch * 0.35);
+              milkGrad.addColorStop(0, '#ffffff');
+              milkGrad.addColorStop(0.35, '#f4f6fa');
+              milkGrad.addColorStop(1, '#cbcfd9');
+
+              ctx.fillStyle = milkGrad;
+              ctx.beginPath();
+              
+              if (liquidNodes.length > 0) {
+                ctx.moveTo(liquidNodes[0].x + offsetX, liquidNodes[0].y + offsetY);
+                for (let i = 1; i < liquidNodes.length - 1; i++) {
+                  const xc = (liquidNodes[i].x + liquidNodes[i + 1].x) / 2 + offsetX;
+                  const yc = (liquidNodes[i].y + liquidNodes[i + 1].y) / 2 + offsetY;
+                  ctx.quadraticCurveTo(liquidNodes[i].x + offsetX, liquidNodes[i].y + offsetY, xc, yc);
+                }
+                ctx.lineTo(liquidNodes[liquidNodes.length - 1].x + offsetX, liquidNodes[liquidNodes.length - 1].y + offsetY);
+              }
+
+              ctx.lineTo(cx + botW, cy + ch * 0.35);
+              ctx.quadraticCurveTo(cx, cy + ch * 0.42, cx - botW, cy + ch * 0.35);
+              ctx.closePath();
+              ctx.fill();
+
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+              ctx.lineWidth = 1.6;
+              ctx.beginPath();
+              if (liquidNodes.length > 0) {
+                ctx.moveTo(liquidNodes[0].x + offsetX, liquidNodes[0].y + offsetY);
+                for (let i = 1; i < liquidNodes.length - 1; i++) {
+                  const xc = (liquidNodes[i].x + liquidNodes[i + 1].x) / 2 + offsetX;
+                  const yc = (liquidNodes[i].y + liquidNodes[i + 1].y) / 2 + offsetY;
+                  ctx.quadraticCurveTo(liquidNodes[i].x + offsetX, liquidNodes[i].y + offsetY, xc, yc);
+                }
+              }
+              ctx.stroke();
+
+              ctx.restore();
+            }
+
+            function drawFluidDroplet(x, y, radius, vy, opacity) {
+              if (opacity <= 0) return;
+              ctx.save();
+              ctx.globalAlpha = opacity;
+
+              const stretch = 1 + Math.min(Math.abs(vy) * 0.04, 0.9);
+              const squish = 1 / Math.sqrt(stretch);
+
+              ctx.translate(x, y);
+
+              const grad = ctx.createRadialGradient(-radius * 0.3, -radius * 0.3, 0, 0, 0, radius * 1.25);
+              grad.addColorStop(0, '#ffffff');
+              grad.addColorStop(0.55, '#f1f3f8');
+              grad.addColorStop(1, '#bdc4d2');
+
+              ctx.fillStyle = grad;
+              ctx.beginPath();
+              ctx.ellipse(0, 0, radius * squish, radius * stretch, 0, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+              ctx.beginPath();
+              ctx.ellipse(-radius * 0.25, -radius * stretch * 0.3, radius * 0.25 * squish, radius * 0.18 * stretch, 0, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.restore();
+            }
+
+            function drawRipples(offsetX, offsetY) {
+              for (const r of ripples) {
+                if (r.life <= 0) continue;
+                ctx.save();
+                ctx.globalAlpha = r.opacity * r.life;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                ctx.lineWidth = 1.5 * r.life;
+                ctx.beginPath();
+                ctx.ellipse(r.x + offsetX, r.y + offsetY, r.radius, r.radius * 0.22, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+
+            function drawParticles(offsetX, offsetY) {
+              const allParticles = [...crownParticles, ...splashParticles];
+              for (const p of allParticles) {
+                if (p.life <= 0) continue;
+                ctx.save();
+                ctx.globalAlpha = p.opacity * p.life;
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(p.x + offsetX, p.y + offsetY, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+
+            function smoothstep(edge0, edge1, x) {
+              const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+              return t * t * (3 - 2 * t);
+            }
+
+            function easeOutBack(x) {
+              const c1 = 1.70158;
+              const c3 = c1 + 1;
+              return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+            }
+
+            let startTime = null;
+            let dropHit = false;
+            let shakeStart = 0;
+            let reboundTriggered = false;
+            let reboundHit = false;
+            let welcomeTriggered = false;
+
+            window.isAppReady = false; 
+            let loaderFading = false;
+            let loaderAnimationFrame;
+
+            function animate(timestamp) {
+              if (!startTime) startTime = timestamp;
+              const elapsed = timestamp - startTime;
+
+              ctx.clearRect(0, 0, W, H);
+
+              mouse.x += (mouse.targetX - mouse.x) * 0.05;
+              mouse.y += (mouse.targetY - mouse.y) * 0.05;
+              const parallaxX = (mouse.x - W / 2) * 0.02;
+              const parallaxY = (mouse.y - H / 2) * 0.02;
+
+              let cameraShakeX = 0;
+              let cameraShakeY = 0;
+              if (dropHit) {
+                const shakeElapsed = elapsed - shakeStart;
+                if (shakeElapsed < 500) {
+                  const shakeMag = 11 * Math.exp(-shakeElapsed / 95);
+                  cameraShakeX = (Math.random() - 0.5) * shakeMag;
+                  cameraShakeY = (Math.random() - 0.5) * shakeMag;
+                }
+              }
+
+              ctx.save();
+              ctx.translate(cameraShakeX, cameraShakeY);
+
+              const bgGrad = ctx.createRadialGradient(W / 2 + parallaxX * 2, H / 2 + parallaxY * 2, 0, W / 2, H / 2, Math.max(W, H) * 0.75);
+              bgGrad.addColorStop(0, '#161925');
+              bgGrad.addColorStop(1, '#06070a');
+              ctx.fillStyle = bgGrad;
+              ctx.fillRect(-20, -20, W + 40, H + 40);
+
+              const cupAppear = smoothstep(200, 700, elapsed);
+              drawGlassCup(cupAppear, parallaxX, parallaxY);
+
+              updateLiquidSurface();
+              drawMilkSurface(cupAppear, parallaxX, parallaxY);
+
+              const surfaceY = liquidNodes.length > 0 ? liquidNodes[Math.floor(NODE_COUNT / 2)].targetY : H * 0.5;
+
+              if (elapsed > 450 && !dropHit) {
+                const gravity = 0.65;
+                drop.vy += gravity;
+                drop.y += drop.vy;
+                drop.opacity = smoothstep(450, 650, elapsed);
+
+                if (drop.y >= surfaceY) {
+                  dropHit = true;
+                  shakeStart = elapsed;
+
+                  const midIndex = Math.floor(NODE_COUNT / 2);
+                  triggerImpulse(midIndex, 40);
+                  triggerImpulse(midIndex - 4, 25);
+                  triggerImpulse(midIndex + 4, 25);
+
+                  spawnCrownSplash(W / 2, surfaceY);
+                  spawnFineMist(W / 2, surfaceY);
+                  spawnRipple(W / 2, surfaceY, 1.2);
+                  setTimeout(() => spawnRipple(W / 2, surfaceY, 0.9), 90);
+                } else {
+                  drawFluidDroplet(drop.x + parallaxX, drop.y + parallaxY, drop.radius, drop.vy, drop.opacity);
+                }
+              }
+
+              if (dropHit && !reboundHit) {
+                const timeSinceImpact = elapsed - shakeStart;
+
+                if (timeSinceImpact > 150 && !reboundTriggered) {
+                  reboundTriggered = true;
+                  reboundDrop.x = W / 2;
+                  reboundDrop.y = surfaceY - 5;
+                  reboundDrop.vy = -8.5;
+                  reboundDrop.opacity = 1.0;
+                  reboundDrop.active = true;
+                }
+
+                if (reboundTriggered && reboundDrop.active) {
+                  const gravity = 0.42;
+                  reboundDrop.vy += gravity;
+                  reboundDrop.y += reboundDrop.vy;
+
+                  if (reboundDrop.vy > 0 && reboundDrop.y >= surfaceY) {
+                    reboundHit = true;
+                    reboundDrop.active = false;
+
+                    const midIndex = Math.floor(NODE_COUNT / 2);
+                    triggerImpulse(midIndex, 16);
+                    spawnRipple(W / 2, surfaceY, 0.7);
+                  } else {
+                    drawFluidDroplet(reboundDrop.x + parallaxX, reboundDrop.y + parallaxY, reboundDrop.radius, reboundDrop.vy, reboundDrop.opacity);
+                  }
+                }
+              }
+
+              for (const r of ripples) {
+                r.radius += r.speed;
+                r.life -= 0.0085;
+              }
+              drawRipples(parallaxX, parallaxY);
+
+              const allParticles = [...crownParticles, ...splashParticles];
+              for (const p of allParticles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.life -= p.decay;
+              }
+              drawParticles(parallaxX, parallaxY);
+
+              ctx.restore();
+
+              const welcomeEl = document.getElementById('welcome-text');
+
+              if (elapsed > 2400 && !welcomeTriggered) {
+                welcomeTriggered = true;
+              }
+
+              if (welcomeTriggered) {
+                const textElapsed = elapsed - 2400;
+                const textProgress = Math.min(textElapsed / 1100, 1);
+
+                const scale = easeOutBack(textProgress);
+                const opacity = smoothstep(0, 0.2, textProgress);
+                const blur = 30 * (1 - smoothstep(0, 0.4, textProgress));
+
+                welcomeEl.style.opacity = opacity;
+                welcomeEl.style.filter = `blur(${blur}px)`;
+                welcomeEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+              }
+
+              const overlay = document.getElementById('loader-overlay');
+              if (elapsed < 400) {
+                overlay.style.opacity = 1 - smoothstep(0, 400, elapsed);
+              } else {
+                overlay.style.opacity = 0;
+              }
+
+              // Fade out loader logic
+              if (elapsed > 3500 && window.isAppReady && !loaderFading) {
+                  loaderFading = true;
+                  const loaderContainer = document.getElementById('loader-container');
+                  document.getElementById('main-app').style.display = 'block'; 
+                  loaderContainer.style.opacity = '0';
+                  setTimeout(() => {
+                      cancelAnimationFrame(loaderAnimationFrame);
+                      loaderContainer.remove();
+                  }, 1000);
+              }
+
+              if (!loaderFading || elapsed < 7000) {
+                loaderAnimationFrame = requestAnimationFrame(animate);
+              }
+            }
+            loaderAnimationFrame = requestAnimationFrame(animate);
+        })();
+
+
+        // --- MAIN APP LOGIC ---
+        
+        function getSubtractAmount(year, month) {
+            // August is month index 7
+            if (year > 2024 || (year === 2024 && month >= 7)) {
+                return 30;
+            }
+            return 25;
+        }
+        
+        // --- YOUR BRAND NEW GOOGLE SCRIPT LINK ---
+        const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWB1zYuBPM4_vMasihEsfI8yv4UsaVw7Nah6fTC--MY_rmmjnJYnVALQCBX5tuCp3l/exec";
+        
+        let realToday = new Date();
+        let displayMonth = realToday.getMonth(); 
+        let displayYear = realToday.getFullYear();
+        let daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+        let baseTotal = 0; 
+        
+        let crossedDates = []; 
+        let displayTotal = 0;
+
+        const totalAmountDisplay = document.getElementById('totalAmountDisplay');
+        const baseAmountText = document.getElementById('baseAmountText');
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const daysGrid = document.getElementById('daysGrid');
+        const syncStatus = document.getElementById('syncStatus');
+        const btnMonthName = document.getElementById('btnMonthName');
+        const currentDateBannerSpan = document.querySelector('#currentDateBanner span');
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // Startup
+        async function init() {
+            // Setup Dates & Themes
+            currentDateBannerSpan.innerText = `${realToday.getDate()} ${monthNames[realToday.getMonth()]} ${realToday.getFullYear()}`;
+            const savedTheme = localStorage.getItem('milkAppTheme') || 'default';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeSelector').value = savedTheme;
+            
+            // Initial Calendar render while downloading
+            updateMathAndRender();
+
+            syncStatus.classList.add('active');
+            syncStatus.innerText = "Downloading live data... ☁️";
+
+            try {
+                let response = await fetch(GOOGLE_APP_SCRIPT_URL + "?action=load");
+                let data = await response.json(); 
+                crossedDates = data; 
+                localStorage.setItem('milkTrackerFinal', JSON.stringify(crossedDates));
+                syncStatus.innerText = "Synced successfully! ✅";
+            } catch (err) {
+                console.log("Fetch error:", err);
+                crossedDates = JSON.parse(localStorage.getItem('milkTrackerFinal')) || [];
+                syncStatus.innerText = "Offline. Using local memory.";
+            }
+
+            setTimeout(() => syncStatus.classList.remove('active'), 2500);
+            updateMathAndRender(); // Re-render with downloaded marks
+
+            // Signal loader to fade out
+            window.isAppReady = true;
+        }
+
+        function changeMonth(direction) {
+            displayMonth += direction;
+            if (displayMonth > 11) { displayMonth = 0; displayYear++; } 
+            else if (displayMonth < 0) { displayMonth = 11; displayYear--; }
+            updateMathAndRender();
+        }
+
+        function updateMathAndRender() {
+            daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+            const currentSubtractAmount = getSubtractAmount(displayYear, displayMonth);
+            baseTotal = daysInMonth * currentSubtractAmount;
+            baseAmountText.innerText = `₹${baseTotal}`;
+            btnMonthName.innerText = monthNames[displayMonth];
+            calculateCurrentTotal();
+            totalAmountDisplay.innerText = `₹${displayTotal}`;
+            renderCalendar();
+        }
+
+        function calculateCurrentTotal() {
+            const countThisMonth = crossedDates.filter(id => id.startsWith(`${displayYear}-${displayMonth}-`)).length;
+            const currentSubtractAmount = getSubtractAmount(displayYear, displayMonth);
+            displayTotal = baseTotal - (countThisMonth * currentSubtractAmount);
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = "₹" + Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+                else obj.innerHTML = "₹" + end;
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function renderCalendar() {
+            daysGrid.innerHTML = "";
+            const firstDay = new Date(displayYear, displayMonth, 1).getDay();
+            monthYearDisplay.innerText = `${monthNames[displayMonth]} ${displayYear}`;
+
+            let delayCount = 0;
+
+            // Empty slots
+            for (let i = 0; i < firstDay; i++) {
+                let emptyDiv = document.createElement("div");
+                emptyDiv.classList.add("day", "empty");
+                daysGrid.appendChild(emptyDiv);
+            }
+
+            // Real Days
+            for (let i = 1; i <= daysInMonth; i++) {
+                let dayDiv = document.createElement("div");
+                dayDiv.classList.add("day");
+                dayDiv.innerText = i;
+                
+                // Add Staggered Animation
+                dayDiv.style.animation = `popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards ${delayCount * 0.01}s`;
+                delayCount++;
+                
+                let dateId = `${displayYear}-${displayMonth}-${i}`;
+                
+                if (crossedDates.includes(dateId)) dayDiv.classList.add("crossed");
+                
+                // Highlight if it is exactly today
+                if (i === realToday.getDate() && displayMonth === realToday.getMonth() && displayYear === realToday.getFullYear()) {
+                    dayDiv.classList.add("is-today");
+                }
+
+                dayDiv.addEventListener("click", (e) => toggleDay(dayDiv, dateId, e));
+                daysGrid.appendChild(dayDiv);
+            }
+        }
+
+        function toggleDay(element, dateId, event) {
+            const rect = element.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top;
+            let oldTotal = displayTotal;
+            let isCrossedNow = false;
+            let currentSubtractAmount = getSubtractAmount(displayYear, displayMonth);
+
+            if (crossedDates.includes(dateId)) {
+                crossedDates = crossedDates.filter(id => id !== dateId);
+                element.classList.remove("crossed");
+                displayTotal += currentSubtractAmount;
+                createFloatingNumber(x, y, `+${currentSubtractAmount}`, 'positive');
+                isCrossedNow = false;
+            } else {
+                crossedDates.push(dateId);
+                element.classList.add("crossed");
+                displayTotal -= currentSubtractAmount;
+                createFloatingNumber(x, y, `-${currentSubtractAmount}`, 'negative');
+                isCrossedNow = true;
+            }
+
+            localStorage.setItem('milkTrackerFinal', JSON.stringify(crossedDates));
+            
+            // Total Bounce Animation
+            totalAmountDisplay.classList.remove("bounce");
+            void totalAmountDisplay.offsetWidth; // Trigger reflow
+            totalAmountDisplay.classList.add("bounce");
+            setTimeout(() => totalAmountDisplay.classList.remove("bounce"), 300);
+            
+            animateValue(totalAmountDisplay, oldTotal, displayTotal, 300);
+
+            // Sync to server
+            syncToGoogleSheets(dateId, isCrossedNow, displayTotal);
+        }
+
+        function createFloatingNumber(x, y, text, type) {
+            const floatEl = document.createElement('div');
+            floatEl.className = `floating-number ${type}`;
+            floatEl.innerText = text;
+            floatEl.style.left = `${x}px`;
+            floatEl.style.top = `${y}px`;
+            document.body.appendChild(floatEl);
+            setTimeout(() => floatEl.remove(), 1200);
+        }
+
+        function changeTheme() {
+            const theme = document.getElementById('themeSelector').value;
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('milkAppTheme', theme);
+        }
+
+        // --- EXPORT FEATURES ---
+        
+        function downloadCurrentMonthExcel() {
+            let currentSubtractAmount = getSubtractAmount(displayYear, displayMonth);
+            
+            let csvContent = "";
+            csvContent += `Month Report, ${monthNames[displayMonth]} ${displayYear}\n`;
+            csvContent += `Base Monthly Total, ₹${baseTotal}\n`;
+            csvContent += `Final Bill Total, ₹${displayTotal}\n\n`;
+            csvContent += "Date,Status,Amount\n";
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                let dateId = `${displayYear}-${displayMonth}-${i}`;
+                let isCrossed = crossedDates.includes(dateId);
+                let status = isCrossed ? "Cut" : "Delivered";
+                let amount = isCrossed ? `-₹${currentSubtractAmount}` : `₹0`;
+                csvContent += `${i}-${monthNames[displayMonth]}-${displayYear},${status},${amount}\n`;
+            }
+            triggerDownload(csvContent, `Milk_Report_${monthNames[displayMonth]}_${displayYear}.csv`);
+        }
+
+        // 2. Custom Export Modal Logic
+        const modal = document.getElementById('exportModal');
+        
+        function openModal() {
+            // Set default dates to current month to be helpful
+            const startInput = document.getElementById('exportStart');
+            const endInput = document.getElementById('exportEnd');
+            startInput.value = `${displayYear}-${String(displayMonth+1).padStart(2,'0')}-01`;
+            endInput.value = `${displayYear}-${String(displayMonth+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        function generateCustomExport() {
+            const startVal = document.getElementById('exportStart').value;
+            const endVal = document.getElementById('exportEnd').value;
+            
+            if (!startVal || !endVal) return alert("Please select both dates.");
+            
+            let startDate = new Date(startVal);
+            let endDate = new Date(endVal);
+            
+            if(startDate > endDate) return alert("Start Date must be before End Date.");
+
+            let csvContent = "";
+            csvContent += `Custom Milk Chart, From ${startVal} to ${endVal}\n\n`;
+            csvContent += "Date,Status,Amount Saved\n";
+            
+            let currentWalker = new Date(startDate);
+            let totalSaved = 0;
+            let totalDelivered = 0;
+
+            // Loop through every day in range
+            while(currentWalker <= endDate) {
+                let wYear = currentWalker.getFullYear();
+                let wMonth = currentWalker.getMonth();
+                let wDate = currentWalker.getDate();
+                
+                let dateId = `${wYear}-${wMonth}-${wDate}`;
+                let isCrossed = crossedDates.includes(dateId);
+                
+                let amt = getSubtractAmount(wYear, wMonth);
+                let status = isCrossed ? "Cut" : "Delivered";
+                let amount = isCrossed ? `₹${amt}` : `₹0`;
+                
+                if(isCrossed) totalSaved += amt;
+                else totalDelivered++;
+
+                csvContent += `${wDate}-${monthNames[wMonth]}-${wYear},${status},${amount}\n`;
+                
+                // Move to next day
+                currentWalker.setDate(currentWalker.getDate() + 1);
+            }
+            
+            csvContent += `\nTotal Delivered Days, ${totalDelivered}\n`;
+            csvContent += `Total Money Saved from Cuts, ₹${totalSaved}\n`;
+
+            triggerDownload(csvContent, `Custom_Milk_Chart_${startVal}_to_${endVal}.csv`);
+            closeModal();
+        }
+
+        function triggerDownload(csvContent, fileName) {
+            try {
+                // Add BOM for proper Excel rendering of currency symbols
+                const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+                const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+                
+                // Try Web Share API for better mobile support if available
+                if (navigator.canShare && navigator.userAgent.toLowerCase().includes('mobile')) {
+                    const file = new File([blob], fileName, { type: 'text/csv' });
+                    if (navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            title: fileName,
+                            files: [file]
+                        }).catch(err => {
+                            console.log("Share failed, falling back to download link", err);
+                            fallbackDownload(blob, fileName);
+                        });
+                        return; // Successfully triggered share
+                    }
+                }
+                
+                // Standard fallback download
+                fallbackDownload(blob, fileName);
+            } catch (e) {
+                console.error("Download Error: ", e);
+                alert("Download failed on your browser/app. Try using a standard browser.");
+            }
+        }
+
+        function fallbackDownload(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 200);
+        }
+
+        // --- NETWORK SYNC ---
+        async function syncToGoogleSheets(dateId, isCrossed, newTotal) {
+            syncStatus.classList.add('active');
+            syncStatus.innerText = "Syncing with Cloud... ⏳";
+
+            let statusWord = isCrossed ? 'Cut' : 'Delivered';
+            let finalUrl = GOOGLE_APP_SCRIPT_URL + `?action=save&date=${dateId}&status=${statusWord}&total=${newTotal}`;
+
+            try {
+                let response = await fetch(finalUrl);
+                let result = await response.json();
+                
+                if(result.status === "success") {
+                    syncStatus.innerText = "Saved to Cloud! ✅";
+                }
+            } catch (err) {
+                console.log("Save error:", err);
+                syncStatus.innerText = "Saved locally (Offline).";
+            }
+            
+            setTimeout(() => syncStatus.classList.remove('active'), 2500);
+        }
+
+        // Start the app!
+        init();
+    </script>
+</body>
+</html>
